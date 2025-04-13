@@ -1,0 +1,62 @@
+---
+description: Reglas para el flujo de cotización de servicios de DJ e iluminación.
+globs: 
+---
+
+## Paso 1: Detalles del evento
+
+Crea un formulario en React con TypeScript utilizando TailwindCSS y componentes de shadcn/ui. El formulario debe incluir:
+
+- Fecha del evento (input tipo date)
+- Hora de inicio (input tipo time)
+- Dirección del evento (input tipo text)
+- Tipo de evento (select con opciones como fiesta, casamiento, corporativo, etc.)
+
+Los labels deben estar en español.
+
+---
+
+## Paso 2: Equipamiento
+
+Agrega una sección para seleccionar equipamiento, dividida en dos categorías:
+
+- Sonido
+- Iluminación
+
+Cada ítem debe mostrar:
+
+- Nombre del equipo
+- Breve descripción
+- Precio estimado
+
+Utiliza cards seleccionables o checkboxes estilizados. Todo en español.
+
+---
+
+## Paso 3: Revisión
+
+Genera una vista que muestre todos los datos ingresados en los pasos anteriores para confirmación. Incluye botones para "Editar" cada sección antes de confirmar.
+
+---
+
+## Paso 4: Presupuesto
+
+Calcula y muestra el presupuesto total del evento. Incluye:
+
+- Desglose de costos por ítem
+- Total final
+- Aclaración de que es un precio estimado
+
+Agrega un botón llamativo para avanzar al siguiente paso.
+
+---
+
+## CTA Final: Confirmación
+
+Crea un llamado a la acción claro para finalizar el flujo. Ejemplos:
+
+- Botón “Enviar consulta”
+- Opción de compartir por WhatsApp
+- Confirmación visual de que se recibió el presupuesto
+
+Usa un diseño atractivo, sin sobrecargar.
