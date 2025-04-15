@@ -44,56 +44,79 @@ const Step = React.forwardRef<HTMLLIElement, StepProps>(
     return (
       <li
         ref={ref}
-        className={cn("relative flex flex-1 snap-center", className)}
+        className={cn("relative flex-1", className)}
         role="listitem"
         aria-current={isActive ? "step" : undefined}
         {...props}
       >
-        <div className="flex flex-1 flex-col items-center gap-2">
-          {/* Línea conectora - antes del paso (excepto el primero) */}
-          {index !== 0 && (
-            <div className="absolute top-5 left-0 right-1/2 h-0.5 hidden md:block">
-              <div className={cn("h-full w-full", isCompleted || isActive ? "bg-primary" : "bg-muted")} />
-            </div>
-          )}
-
-          {/* Línea conectora - después del paso (excepto el último) */}
-          {!isLast && (
-            <div className="absolute top-5 left-1/2 right-0 h-0.5 hidden md:block">
-              <div className={cn("h-full w-full", isCompleted ? "bg-primary" : "bg-muted")} />
-            </div>
-          )}
-
-          <button
-            onClick={() => !disabled && onClick(index)}
-            className={cn(
-              "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300",
-              isActive
-                ? "border-primary bg-primary text-primary-foreground"
-                : isCompleted
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-muted bg-background",
-              disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
-            )}
-            disabled={disabled}
-            aria-disabled={disabled}
-            type="button"
-          >
-            {isCompleted ? (
-              <Check className="h-5 w-5" />
-            ) : (
-              <div className="flex items-center justify-center">
-                {React.isValidElement(step.icon)
-                  ? React.cloneElement(step.icon as React.ReactElement<React.HTMLAttributes<HTMLElement>>, {
-                      className: "h-5 w-5",
-                    })
-                  : step.icon}
+        {/* Contenedor principal */}
+        <div className="flex flex-col items-center">
+          <div className="relative flex items-center justify-center w-full">
+            {/* Línea horizontal a la izquierda (excepto el primer paso) */}
+            {index !== 0 && (
+              <div className="absolute left-0 right-1/2 top-1/2 -translate-y-1/2">
+                <div className={cn(
+                  "h-[2px] w-full", 
+                  isCompleted || isActive ? "bg-primary" : "bg-gray-200"
+                )} />
               </div>
             )}
-          </button>
-          <div className="flex flex-col items-center text-center">
-            <span className={cn("font-medium", isActive ? "text-primary" : "text-foreground")}>{step.title}</span>
-            <span className="text-xs text-muted-foreground">{step.description}</span>
+            
+            {/* Línea horizontal a la derecha (excepto el último paso) */}
+            {!isLast && (
+              <div className="absolute left-1/2 right-0 top-1/2 -translate-y-1/2">
+                <div className={cn(
+                  "h-[2px] w-full", 
+                  isCompleted ? "bg-primary" : "bg-gray-200"
+                )} />
+              </div>
+            )}
+            
+            {/* Círculo del paso */}
+            <button
+              onClick={() => !disabled && onClick(index)}
+              className={cn(
+                "relative z-10 flex items-center justify-center rounded-full border-2 transition-colors",
+                "h-10 w-10",
+                isActive
+                  ? "border-primary bg-primary text-white"
+                  : isCompleted
+                    ? "border-primary bg-primary text-white"
+                    : "border-gray-200 bg-white text-gray-400",
+                disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+              )}
+              disabled={disabled}
+              aria-disabled={disabled}
+              type="button"
+            >
+              {isCompleted ? (
+                <Check className="h-5 w-5" />
+              ) : (
+                <div className="flex items-center justify-center">
+                  {React.isValidElement(step.icon)
+                    ? React.cloneElement(step.icon as React.ReactElement<React.HTMLAttributes<HTMLElement>>, {
+                        className: "h-5 w-5",
+                      })
+                    : step.icon}
+                </div>
+              )}
+            </button>
+          </div>
+
+          {/* Texto (visible solo para el paso activo en móvil) */}
+          <div className={cn(
+            "flex flex-col items-center text-center mt-2",
+            !isActive && "hidden md:flex" // Hide labels for non-active steps on mobile
+          )}>
+            <span 
+              className={cn(
+                "font-medium text-base", 
+                isActive ? "text-primary" : "text-gray-600"
+              )}
+            >
+              {step.title}
+            </span>
+            <span className="text-xs text-gray-400 mt-0.5">{step.description}</span>
           </div>
         </div>
       </li>
@@ -136,11 +159,10 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
     )
 
     return (
-      <div ref={ref} className={cn("w-full", className)} {...props}>
+      <div ref={ref} className={cn("w-full px-6", className)} {...props}>
         <ul
-          className="flex snap-x snap-mandatory overflow-x-auto md:overflow-visible flex-col md:flex-row gap-8 md:gap-0 pb-4 md:pb-0"
+          className="flex w-full justify-between py-4"
           role="list"
-          style={{ scrollbarWidth: "none" }}
         >
           {steps.map((step, index) => (
             <Step
