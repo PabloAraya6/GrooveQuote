@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import type { QuoteResult } from "@/lib/types"
@@ -13,6 +14,9 @@ interface QuoteResultStepProps {
 }
 
 export function QuoteResultStep({ isLoading, quoteResult, onSelectTier, onBack }: QuoteResultStepProps) {
+  const [lastHoveredTier, setLastHoveredTier] = useState<"basic" | "standard" | "premium" | null>('standard')
+  const justTouched = useRef(false)
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center space-y-4 py-12">
@@ -32,10 +36,24 @@ export function QuoteResultStep({ isLoading, quoteResult, onSelectTier, onBack }
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-ES", {
+    return new Intl.NumberFormat("es-AR", {
       style: "currency",
-      currency: "EUR",
+      currency: "ARS",
     }).format(price)
+  }
+
+  const handleTouchStart = (tier: "basic" | "standard" | "premium") => {
+    justTouched.current = true
+    setLastHoveredTier(tier)
+  }
+
+  const handleCardClick = (tier: "basic" | "standard" | "premium") => {
+    if (justTouched.current) {
+      justTouched.current = false
+      return
+    }
+    setLastHoveredTier(tier)
+    onSelectTier(tier)
   }
 
   return (
@@ -46,8 +64,15 @@ export function QuoteResultStep({ isLoading, quoteResult, onSelectTier, onBack }
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="flex flex-col">
-          <CardHeader>
+        <Card
+          className={`flex flex-col border group transition-all duration-200 cursor-pointer ${
+            lastHoveredTier === 'basic' ? 'border-primary border-2' : 'border'
+          }`}
+          onMouseEnter={() => setLastHoveredTier('basic')}
+          onTouchStart={() => handleTouchStart('basic')}
+          onClick={() => handleCardClick('basic')}
+        >
+          <CardHeader className={`transition-colors duration-200 ${lastHoveredTier === 'basic' ? 'bg-primary/10' : ''}`}>
             <CardTitle>{quoteResult.basic.name}</CardTitle>
             <CardDescription>Opción económica</CardDescription>
           </CardHeader>
@@ -63,14 +88,27 @@ export function QuoteResultStep({ isLoading, quoteResult, onSelectTier, onBack }
             </ul>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" variant="outline" onClick={() => onSelectTier("basic")}>
+            <Button
+              className={`w-full transition-colors duration-200 ${
+                lastHoveredTier === 'basic' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''
+              }`}
+              variant="outline"
+              onClick={() => onSelectTier("basic")}
+            >
               Continuar
             </Button>
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col border-primary">
-          <CardHeader className="bg-primary/10">
+        <Card
+          className={`flex flex-col border group transition-all duration-200 cursor-pointer ${
+            lastHoveredTier === 'standard' ? 'border-primary border-2' : 'border'
+          }`}
+          onMouseEnter={() => setLastHoveredTier('standard')}
+          onTouchStart={() => handleTouchStart('standard')}
+          onClick={() => handleCardClick('standard')}
+        >
+          <CardHeader className={`transition-colors duration-200 ${lastHoveredTier === 'standard' ? 'bg-primary/10' : ''}`}>
             <CardTitle>{quoteResult.standard.name}</CardTitle>
             <CardDescription>Recomendado</CardDescription>
           </CardHeader>
@@ -86,14 +124,27 @@ export function QuoteResultStep({ isLoading, quoteResult, onSelectTier, onBack }
             </ul>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" onClick={() => onSelectTier("standard")}>
+            <Button
+              className={`w-full transition-colors duration-200 ${
+                lastHoveredTier === 'standard' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''
+              }`}
+              variant="outline"
+              onClick={() => onSelectTier("standard")}
+            >
               Continuar
             </Button>
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col">
-          <CardHeader>
+        <Card
+          className={`flex flex-col border group transition-all duration-200 cursor-pointer ${
+            lastHoveredTier === 'premium' ? 'border-primary border-2' : 'border'
+          }`}
+          onMouseEnter={() => setLastHoveredTier('premium')}
+          onTouchStart={() => handleTouchStart('premium')}
+          onClick={() => handleCardClick('premium')}
+        >
+          <CardHeader className={`transition-colors duration-200 ${lastHoveredTier === 'premium' ? 'bg-primary/10' : ''}`}>
             <CardTitle>{quoteResult.premium.name}</CardTitle>
             <CardDescription>Experiencia completa</CardDescription>
           </CardHeader>
@@ -109,7 +160,13 @@ export function QuoteResultStep({ isLoading, quoteResult, onSelectTier, onBack }
             </ul>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" variant="outline" onClick={() => onSelectTier("premium")}>
+            <Button
+              className={`w-full transition-colors duration-200 ${
+                lastHoveredTier === 'premium' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''
+              }`}
+              variant="outline"
+              onClick={() => onSelectTier("premium")}
+            >
               Continuar
             </Button>
           </CardFooter>
