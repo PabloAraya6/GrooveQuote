@@ -37,7 +37,7 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
   
   return (
     <motion.div 
-      className="w-full flex justify-center py-4 px-4"
+      className="w-full flex justify-center py-4"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, type: "spring", stiffness: 100 }}

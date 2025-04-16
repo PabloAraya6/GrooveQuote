@@ -12,7 +12,7 @@ import { StepIndicator } from "./step-indicator"
 import type { QuoteFormData, QuoteResult } from "@/lib/types"
 import { loadFormData, saveFormData, calculateQuote } from "@/lib/utils"
 
-const steps = ["Detalles del evento", "Equipamiento", "Revisión", "Presupuesto"]
+const steps = ["Evento", "Equipamiento", "Revisión", "Presupuesto"]
 
 export function QuoteWizard() {
   const router = useRouter()
@@ -85,7 +85,7 @@ export function QuoteWizard() {
     <div className="container mx-auto min-h-screen max-w-4xl px-4 py-8">
       <StepIndicator steps={steps} currentStep={currentStep} />
 
-      <div className="mt-8">
+      <div>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}

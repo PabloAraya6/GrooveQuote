@@ -159,9 +159,9 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
     )
 
     return (
-      <div ref={ref} className={cn("w-full px-6", className)} {...props}>
+      <div ref={ref} className={cn("w-full px-6 md:py-4", className)} {...props}>
         <ul
-          className="flex w-full justify-between py-4"
+          className="flex w-full justify-between"
           role="list"
         >
           {steps.map((step, index) => (

@@ -1,8 +1,12 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
+import { useRouter } from "next/navigation"
 
 export function LandingPage() {
+  const router = useRouter()
   return (
     <div className="flex min-h-screen flex-col">
       <header className="container flex items-center justify-between py-4">
@@ -19,7 +23,7 @@ export function LandingPage() {
               Obtén un presupuesto personalizado para tu evento en minutos. Sonido, iluminación y más.
             </p>
           </div>
-          <Link href="/quote">
+          <Link href="/quote" onClick={() => router.push("/quote")}>
             <Button size="lg" className="h-12 px-8">
               Cotiza ahora
             </Button>

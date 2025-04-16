@@ -38,7 +38,7 @@ export function EventDetailsStep({ data, onUpdate, onNext }: EventDetailsStepPro
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Detalles del evento</h2>
         <p className="text-muted-foreground">
@@ -47,7 +47,7 @@ export function EventDetailsStep({ data, onUpdate, onNext }: EventDetailsStepPro
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
           <FormField
             control={form.control}
             name="date"
@@ -141,7 +141,7 @@ export function EventDetailsStep({ data, onUpdate, onNext }: EventDetailsStepPro
             )}
           />
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full sm:w-auto sm:ml-auto sm:block">
             Siguiente
           </Button>
         </form>
