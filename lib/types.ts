@@ -16,13 +16,29 @@ export const eventDetailsSchema = z.object({
 
 // Equipment schema
 export const equipmentSchema = z.object({
-  sound: z.boolean().optional(),
-  lighting: z.boolean().optional(),
-  ledFloor: z.boolean().optional(),
-  dj: z.boolean().optional(),
-  microphones: z.number().min(0).max(10).optional(),
-  speakers: z.number().min(0).max(20).optional(),
+  // Basic equipment
+  dj: z.boolean().default(false),
+  djSchedule: z.string().optional(),
+  sound: z.boolean().default(false),
+  lighting: z.boolean().default(false),
+  lightingType: z.enum(["estándar", "profesional"]).optional(),
+  
+  // Extra equipment
+  ledFloor: z.boolean().default(false),
+  archStructure: z.boolean().default(false),
+  spiderStructure: z.boolean().default(false),
+  fogMachine: z.boolean().default(false),
+  ledDecoration: z.number().min(0).default(0),
+  wirelessMic: z.number().min(0).default(0),
+  outsideTransport: z.boolean().default(false),
+  
+  // Legacy fields
+  microphones: z.number().min(0).max(10).default(0),
+  speakers: z.number().min(0).max(20).default(4),
 })
+
+// Payment method type
+export const paymentMethodSchema = z.enum(["mercadopago", "transfer"]).optional()
 
 // Contact schema
 export const contactSchema = z.object({
@@ -35,6 +51,10 @@ export const contactSchema = z.object({
   phone: z.string().min(8, {
     message: "Número de teléfono inválido",
   }),
+  acceptCancellationPolicy: z.boolean().default(false).refine(val => val === true, {
+    message: "Debes aceptar la política de cancelación",
+  }),
+  paymentMethod: paymentMethodSchema,
 })
 
 // Complete form schema
@@ -47,12 +67,18 @@ export const quoteFormSchema = z.object({
 export type EventDetails = z.infer<typeof eventDetailsSchema>
 export type Equipment = z.infer<typeof equipmentSchema>
 export type Contact = z.infer<typeof contactSchema>
+export type PaymentMethod = z.infer<typeof paymentMethodSchema>
 export type QuoteFormData = z.infer<typeof quoteFormSchema>
 
 export type QuoteTier = {
   name: string
   price: number
   features: string[]
+}
+
+export type EquipmentPrice = {
+  name: string
+  price: number
 }
 
 export type QuoteResult = {
