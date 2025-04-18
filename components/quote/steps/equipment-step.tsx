@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
+import { TimeRangePicker } from "@/components/ui/time-range-picker"
 import { 
   PlusIcon, 
   MinusIcon, 
@@ -117,7 +118,6 @@ export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepP
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold">Elige tu equipamiento</h2>
-            <p className="text-muted-foreground">Progreso: 50%</p>
           </div>
         </div>
       </div>
@@ -138,14 +138,15 @@ export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepP
                 form={form}
               >
                 {form.watch("dj") && (
-                  <div className="mt-3 border-t pt-2">
-                    <label className="text-sm font-medium">
+                  <div className="mt-3 border-t pt-2" onClick={(e) => e.stopPropagation()}>
+                    <label className="text-sm font-medium block mb-2">
                       Horario
-                      <input
-                        type="text"
-                        placeholder="Ej: 20:00 - 02:00"
-                        className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
-                        {...form.register("djSchedule")}
+                      <TimeRangePicker
+                        value={form.watch("djSchedule") || ""}
+                        onChange={(formattedTime, hours) => {
+                          form.setValue("djSchedule", formattedTime);
+                        }}
+                        className="mt-2"
                       />
                     </label>
                   </div>
