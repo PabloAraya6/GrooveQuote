@@ -106,61 +106,6 @@ export function ReviewStep({ data, onNext, onBack, onEdit }: ReviewStepProps) {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold">Revisa tu cotización</h2>
-            <p className="text-muted-foreground text-sm mt-1">
-              Revisa los detalles de tu evento y equipamiento antes de continuar
-            </p>
-          </div>
-          
-          {/* Progress indicator */}
-          <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
-            <span className="font-medium text-primary">Evento</span>
-            <ChevronRightIcon className="h-3 w-3" />
-            <span className="font-medium text-primary">Equipamiento</span>
-            <ChevronRightIcon className="h-3 w-3" />
-            <span className="font-medium">Revisión</span>
-            <ChevronRightIcon className="h-3 w-3" />
-            <span>Presupuesto</span>
-          </div>
-          
-          {/* Mobile steps tracker */}
-          <div className="flex sm:hidden items-center justify-between w-full mb-1">
-            <div className="flex items-center gap-1">
-              <span className="text-xs font-medium text-primary">3/4</span>
-              <span className="text-xs text-muted-foreground">Paso 3: Revisión</span>
-            </div>
-            <div className="flex gap-1">
-              <div className="h-1.5 w-6 rounded-full bg-primary"></div>
-              <div className="h-1.5 w-6 rounded-full bg-primary"></div>
-              <div className="h-1.5 w-6 rounded-full bg-primary"></div>
-              <div className="h-1.5 w-6 rounded-full bg-muted"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Compact overview for mobile */}
-      <div className="block sm:hidden mb-4">
-        <div className="border rounded-lg p-3 bg-gray-50 dark:bg-gray-900/30">
-          <h3 className="text-sm font-medium mb-2">Resumen de servicios</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { icon: <CalendarIcon className="h-3.5 w-3.5" />, label: "Evento", status: getSectionStatus("event") },
-              { icon: <HeadphonesIcon className="h-3.5 w-3.5" />, label: "DJ", status: getSectionStatus("dj") },
-              { icon: <SpeakerIcon className="h-3.5 w-3.5" />, label: "Sonido", status: getSectionStatus("sound") },
-              { icon: <SparklesIcon className="h-3.5 w-3.5" />, label: "Iluminación", status: getSectionStatus("lighting") },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-1.5">
-                <div className={cn(
-                  "p-1 rounded-full",
-                  item.status 
-                    ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400" 
-                    : "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
-                )}>
-                  {item.status ? <CheckIcon className="h-3 w-3" /> : item.icon}
-                </div>
-                <span className="text-xs">{item.label}</span>
-              </div>
-            ))}
           </div>
         </div>
       </div>
