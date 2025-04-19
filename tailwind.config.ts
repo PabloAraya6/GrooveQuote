@@ -19,6 +19,34 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-manrope)", "system-ui", "sans-serif"],
+        manrope: ["var(--font-manrope)", "system-ui", "sans-serif"],
+        grotesk: ["var(--font-space-grotesk)", "Arial", "sans-serif"],
+      },
+      fontSize: {
+        xs: ['0.75rem', { lineHeight: '1rem' }],         // 12px
+        sm: ['0.875rem', { lineHeight: '1.25rem' }],     // 14px
+        base: ['1rem', { lineHeight: '1.5rem' }],        // 16px
+        lg: ['1.125rem', { lineHeight: '1.75rem' }],     // 18px
+        xl: ['1.25rem', { lineHeight: '1.75rem' }],      // 20px
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],    // 24px - line height ajustado
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],     // 30px - line height ajustado
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],   // 36px - line height ajustado
+        '5xl': ['3rem', { lineHeight: '1.25' }],          // 48px - line height más ajustado
+        '6xl': ['3.75rem', { lineHeight: '1.2' }],         // 60px - line height más ajustado
+        '7xl': ['4.5rem', { lineHeight: '1.15' }],        // 72px - para títulos impactantes
+      },
+      letterSpacing: {
+        tightest: '-.05em',
+        tighter: '-.03em',
+        tight: '-.015em',
+        normal: '0',
+        wide: '.015em',
+        wider: '.03em',
+        widest: '.05em',
+        event: '.15em',  // Extra ancho para efectos de eventos
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -83,6 +111,13 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "gradient": "gradient 8s linear infinite",
         "blur-in": "blur 0.6s ease-out forwards",
+      },
+      textShadow: {
+        sm: '0 1px 2px var(--tw-shadow-color)',
+        DEFAULT: '0 2px 4px var(--tw-shadow-color)',
+        lg: '0 8px 16px var(--tw-shadow-color)',
+        glow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0073e6, 0 0 20px #0073e6',
+        neon: '0 0 5px #fff, 0 0 10px #fff, 0 0 20px #ff00de, 0 0 30px #ff00de, 0 0 40px #ff00de',
       },
     },
   },
