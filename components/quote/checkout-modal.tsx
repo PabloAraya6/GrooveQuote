@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -14,23 +15,43 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
-import { type Contact, contactSchema, type QuoteTier } from "@/lib/types"
-import { useState } from "react"
-import { Loader2, CreditCardIcon, BuildingIcon, CheckIcon } from "lucide-react"
+import { type Contact, contactSchema, type QuoteTier, type QuoteFormData, type Equipment } from "@/lib/types"
+import { loadFormData } from "@/lib/utils"
+import { Loader2 } from "lucide-react"
 
 interface CheckoutModalProps {
   isOpen: boolean
   onClose: () => void
   tier: QuoteTier
-  onSubmit: (data: Contact & { paymentMethod: PaymentMethod }) => void
+  onSubmit: (data: Contact & { paymentMethod: string }) => void
 }
 
-type PaymentMethod = "mercadopago" | "transfer";
+// Estos precios deben coincidir con los de equipment-step.tsx y quote-result-step.tsx
+const EQUIPMENT_PRICES = {
+  dj: 100000,
+  sound: {
+    "básico": 90000,
+    "estándar": 110000,
+    "exterior": 120000
+  },
+  lighting: {
+    "estándar": 100000,
+    "profesional": 120000
+  },
+  ledFloor: 3000,
+  archStructure: 100000,
+  spiderStructure: 200000,
+  fogMachine: 20000,
+  ledDecoration: 7000,
+  wirelessMic: 2000,
+  outsideTransport: 1800
+}
 
 export function CheckoutModal({ isOpen, onClose, tier, onSubmit }: CheckoutModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("mercadopago")
+  const [formData, setFormData] = useState<Partial<QuoteFormData> | null>(null)
+  const [totalPrice, setTotalPrice] = useState(tier.price)
+  const [deposit, setDeposit] = useState(tier.price * 0.5)
 
   const form = useForm({
     resolver: zodResolver(contactSchema),
@@ -42,14 +63,77 @@ export function CheckoutModal({ isOpen, onClose, tier, onSubmit }: CheckoutModal
     },
   })
 
+  // Calcular el precio total basado en el equipamiento seleccionado
+  const calculateTotalPrice = (equipment: Equipment) => {
+    let price = 0;
+    
+    // Servicios básicos
+    if (equipment.dj) price += EQUIPMENT_PRICES.dj;
+    
+    if (equipment.sound) {
+      const soundType = equipment.soundType || "estándar";
+      price += EQUIPMENT_PRICES.sound[soundType];
+    }
+    
+    if (equipment.lighting) {
+      const lightingType = equipment.lightingType || "estándar";
+      price += EQUIPMENT_PRICES.lighting[lightingType];
+    }
+    
+    // Equipamiento adicional
+    if (equipment.ledFloor) price += EQUIPMENT_PRICES.ledFloor;
+    if (equipment.archStructure) price += EQUIPMENT_PRICES.archStructure;
+    if (equipment.spiderStructure) price += EQUIPMENT_PRICES.spiderStructure;
+    if (equipment.fogMachine) price += EQUIPMENT_PRICES.fogMachine;
+    
+    // Elementos con cantidad
+    price += (equipment.ledDecoration || 0) * EQUIPMENT_PRICES.ledDecoration;
+    price += (equipment.wirelessMic || 0) * EQUIPMENT_PRICES.wirelessMic;
+    
+    // Extras
+    if (equipment.outsideTransport) price += EQUIPMENT_PRICES.outsideTransport;
+    
+    return price;
+  };
+
+  // Cargar datos del localStorage
+  useEffect(() => {
+    const savedData = loadFormData()
+    if (savedData) {
+      setFormData(savedData)
+      
+      // Calcular precio real desde localStorage si existe equipment
+      if (savedData.equipment) {
+        const equipmentData = savedData.equipment as Equipment;
+        const calculatedPrice = calculateTotalPrice(equipmentData);
+        setTotalPrice(calculatedPrice);
+        setDeposit(calculatedPrice * 0.5);
+      }
+      
+      // Prellenar formulario con datos de contacto si existen
+      if (savedData.contact) {
+        form.reset({
+          name: savedData.contact.name || "",
+          email: savedData.contact.email || "",
+          phone: savedData.contact.phone || "",
+          acceptCancellationPolicy: false, // Siempre requerir volver a aceptar
+        })
+      }
+    }
+  }, [form])
+
   const handleSubmit = async (values: Contact) => {
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    onSubmit({ ...values, paymentMethod });
-    setIsSubmitting(false)
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      onSubmit({ ...values, paymentMethod: "mercadopago" });
+    } catch (error) {
+      console.error("Error al procesar el pago", error);
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const formatPrice = (price: number) => {
@@ -59,12 +143,9 @@ export function CheckoutModal({ isOpen, onClose, tier, onSubmit }: CheckoutModal
     }).format(price)
   }
 
-  // Calculate deposit (50%)
-  const deposit = tier.price * 0.5;
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">Finalizar reserva</DialogTitle>
           <DialogDescription>
@@ -72,43 +153,16 @@ export function CheckoutModal({ isOpen, onClose, tier, onSubmit }: CheckoutModal
           </DialogDescription>
         </DialogHeader>
         
-        {/* Order Summary */}
-        <div className="bg-muted/50 p-4 rounded-lg mb-4">
-          <h3 className="font-medium mb-2">Resumen de tu presupuesto</h3>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span>Plan {tier.name}</span>
-              <span>{formatPrice(tier.price)}</span>
-            </div>
-            {tier.features.slice(0, 3).map((feature, index) => (
-              <div key={index} className="flex items-center text-muted-foreground">
-                <span className="ml-2 text-xs">• {feature}</span>
-              </div>
-            ))}
-            {tier.features.length > 3 && (
-              <div className="text-xs text-muted-foreground ml-2">
-                • y {tier.features.length - 3} ítems más
-              </div>
-            )}
-          </div>
-          
-          <Separator className="my-2" />
-          
-          <div className="flex justify-between font-medium">
-            <span>Precio total:</span>
-            <span>{formatPrice(tier.price)}</span>
-          </div>
-          <div className="flex justify-between text-primary font-semibold mt-2">
-            <span>Seña a abonar ahora (50%):</span>
-            <span>{formatPrice(deposit)}</span>
-          </div>
+        {/* Simplified Payment Summary */}
+        <div className="flex justify-between text-primary font-semibold p-3 bg-primary/10 rounded-lg mb-4">
+          <span>Seña a abonar ahora (50%):</span>
+          <span>{formatPrice(deposit)}</span>
         </div>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
             {/* Contact Information */}
             <div className="space-y-4">
-              <h3 className="font-medium">Datos de contacto</h3>
               <FormField
                 control={form.control}
                 name="name"
@@ -150,54 +204,12 @@ export function CheckoutModal({ isOpen, onClose, tier, onSubmit }: CheckoutModal
               />
             </div>
             
-            {/* Payment Method */}
-            <div className="space-y-4">
-              <h3 className="font-medium">Método de pago</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div 
-                  className={`border rounded-lg p-4 flex items-center gap-3 cursor-pointer transition-all ${
-                    paymentMethod === "mercadopago" ? "border-primary bg-primary/5" : ""
-                  }`}
-                  onClick={() => setPaymentMethod("mercadopago")}
-                >
-                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
-                    <CreditCardIcon className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium">Mercado Pago</h4>
-                    <p className="text-xs text-muted-foreground">Tarjetas, QR, etc.</p>
-                  </div>
-                  {paymentMethod === "mercadopago" && (
-                    <CheckIcon className="h-5 w-5 text-primary" />
-                  )}
-                </div>
-                
-                <div 
-                  className={`border rounded-lg p-4 flex items-center gap-3 cursor-pointer transition-all ${
-                    paymentMethod === "transfer" ? "border-primary bg-primary/5" : ""
-                  }`}
-                  onClick={() => setPaymentMethod("transfer")}
-                >
-                  <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-500">
-                    <BuildingIcon className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium">Transferencia</h4>
-                    <p className="text-xs text-muted-foreground">Datos bancarios</p>
-                  </div>
-                  {paymentMethod === "transfer" && (
-                    <CheckIcon className="h-5 w-5 text-primary" />
-                  )}
-                </div>
-              </div>
-            </div>
-            
             {/* Accept Terms */}
             <FormField
               control={form.control}
               name="acceptCancellationPolicy"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3">
                   <FormControl>
                     <Checkbox 
                       checked={field.value} 
@@ -216,7 +228,7 @@ export function CheckoutModal({ isOpen, onClose, tier, onSubmit }: CheckoutModal
               )}
             />
             
-            <DialogFooter className="flex flex-col sm:flex-row gap-3 sm:gap-0">
+            <DialogFooter className="flex flex-col sm:flex-row gap-3 sm:gap-0 pt-2">
               <Button type="button" variant="outline" onClick={onClose} className="sm:mr-auto">
                 Cancelar
               </Button>
