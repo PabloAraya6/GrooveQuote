@@ -26,8 +26,8 @@
     --radius: 0.5rem;
     
     /* Variables de tipografía para eventos */
-    --font-size-base: 1rem;      /* 16px */
-    --line-height-base: 1.5;     /* 24px */
+    --font-size-base: 1rem;  /* 16px */
+    --line-height-base: 1.5;
     --letter-spacing-tight: -0.025em;
     --letter-spacing-normal: 0;
     --letter-spacing-wide: 0.025em;
@@ -63,19 +63,19 @@
   }
   
   html {
-    font-size: 16px;
+    font-size: 16px; /* Tamaño base estándar */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   
   body {
-    @apply bg-background text-foreground font-manrope text-base leading-relaxed;
+    @apply bg-background text-foreground font-sans text-base leading-relaxed;
     font-feature-settings: "kern", "liga", "calt";
   }
   
   /* Sistema de encabezados para sitio de eventos */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-grotesk font-bold;
+    @apply font-sans font-bold;
     margin-top: 1.5em;
     margin-bottom: 0.75em;
     line-height: 1.2;
@@ -100,16 +100,16 @@
   }
   
   h5 {
-    @apply text-lg md:text-xl font-manrope font-bold;
+    @apply text-lg md:text-xl font-sans font-bold;
   }
   
   h6 {
-    @apply text-base md:text-lg font-manrope font-bold;
+    @apply text-base md:text-lg font-sans font-bold;
   }
   
   p {
     margin-bottom: 1.25em;
-    @apply font-manrope;
+    @apply font-sans;
     max-width: 70ch; /* Limita el ancho para mejor legibilidad */
   }
   
@@ -123,43 +123,39 @@
   
   /* Elementos específicos para eventos y servicios */
   .event-title {
-    @apply font-grotesk text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
+    @apply font-sans text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
     line-height: 1.1;
     letter-spacing: -0.02em;
   }
   
   .event-accent {
-    @apply font-grotesk font-bold;
+    @apply font-sans font-bold;
   }
   
   .event-subtitle {
-    @apply font-manrope text-xl md:text-2xl font-medium;
+    @apply font-sans text-xl md:text-2xl font-medium;
   }
   
   .dj-name {
-    @apply font-grotesk font-bold tracking-tight;
+    @apply font-sans font-bold tracking-tight;
   }
   
   .price-display {
-    @apply font-grotesk font-bold text-2xl md:text-3xl;
+    @apply font-sans font-bold text-2xl md:text-3xl;
   }
   
   .service-name {
-    @apply font-grotesk font-bold;
+    @apply font-sans font-bold;
   }
   
   .feature-text {
-    @apply font-manrope font-medium;
+    @apply font-sans font-medium;
   }
 }
 
 /* Clases de utilidad para fuentes */
-.font-grotesk {
-  font-family: var(--font-space-grotesk);
-}
-
-.font-manrope {
-  font-family: var(--font-manrope);
+.font-sans {
+  font-family: var(--font-dm-sans);
 }
 
 /* Clases para ajuste tipográfico */
