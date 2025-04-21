@@ -57,7 +57,9 @@ const Step = React.forwardRef<HTMLLIElement, StepProps>(
               <div className="absolute left-0 right-1/2 top-1/2 -translate-y-1/2">
                 <div className={cn(
                   "h-[2px] w-full", 
-                  isCompleted || isActive ? "bg-primary" : "bg-gray-200"
+                  isCompleted || isActive 
+                    ? "bg-primary" 
+                    : "bg-gray-200 dark:bg-gray-700"
                 )} />
               </div>
             )}
@@ -67,7 +69,9 @@ const Step = React.forwardRef<HTMLLIElement, StepProps>(
               <div className="absolute left-1/2 right-0 top-1/2 -translate-y-1/2">
                 <div className={cn(
                   "h-[2px] w-full", 
-                  isCompleted ? "bg-primary" : "bg-gray-200"
+                  isCompleted 
+                    ? "bg-primary" 
+                    : "bg-gray-200 dark:bg-gray-700"
                 )} />
               </div>
             )}
@@ -79,10 +83,10 @@ const Step = React.forwardRef<HTMLLIElement, StepProps>(
                 "relative z-10 flex items-center justify-center rounded-full border-2 transition-colors",
                 "h-10 w-10",
                 isActive
-                  ? "border-primary bg-primary text-white"
+                  ? "border-primary bg-primary text-primary-foreground"
                   : isCompleted
-                    ? "border-primary bg-primary text-white"
-                    : "border-gray-200 bg-white text-gray-400",
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-gray-200 dark:border-gray-700 bg-background text-muted-foreground",
                 disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
               )}
               disabled={disabled}
@@ -111,12 +115,14 @@ const Step = React.forwardRef<HTMLLIElement, StepProps>(
             <span 
               className={cn(
                 "font-medium text-base", 
-                isActive ? "text-primary" : "text-gray-600"
+                isActive 
+                  ? "text-primary" 
+                  : "text-foreground/80 dark:text-foreground/70"
               )}
             >
               {step.title}
             </span>
-            <span className="text-xs text-gray-400 mt-0.5">{step.description}</span>
+            <span className="text-xs text-muted-foreground mt-0.5">{step.description}</span>
           </div>
         </div>
       </li>

@@ -20,6 +20,7 @@ export const equipmentSchema = z.object({
   dj: z.boolean().default(false),
   djSchedule: z.string().optional(),
   sound: z.boolean().default(false),
+  soundType: z.enum(["básico", "estándar", "exterior"]).optional(),
   lighting: z.boolean().default(false),
   lightingType: z.enum(["estándar", "profesional"]).optional(),
   

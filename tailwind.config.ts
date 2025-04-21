@@ -105,12 +105,17 @@ const config = {
           '0%': { filter: 'blur(8px)', opacity: '0' },
           '100%': { filter: 'blur(0)', opacity: '1' },
         },
+        ripple: {
+          '0%': { transform: 'scale(0)', opacity: '0.7' },
+          '100%': { transform: 'scale(2.5)', opacity: '0' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "gradient": "gradient 8s linear infinite",
         "blur-in": "blur 0.6s ease-out forwards",
+        "ripple": "ripple 0.8s ease-out forwards",
       },
       textShadow: {
         sm: '0 1px 2px var(--tw-shadow-color)',

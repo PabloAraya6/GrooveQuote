@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react"
 import { CalendarIcon, InfoIcon, DollarSignIcon, MusicIcon } from "lucide-react"
 import { Stepper, StepItem } from "@/components/ui/stepper"
 import { motion } from "framer-motion"
+import { useTheme } from "next-themes"
+import { cn } from "@/lib/utils"
 
 interface StepIndicatorProps {
   steps: string[]
@@ -12,10 +14,10 @@ interface StepIndicatorProps {
 
 const mapStepsToStepItems = (steps: string[]): StepItem[] => {
   const icons = [
-    <InfoIcon key="info" />,
-    <MusicIcon key="music" />,
-    <CalendarIcon key="calendar" />,
-    <DollarSignIcon key="dollar" />,
+    <InfoIcon key="info" className="text-current" />,
+    <MusicIcon key="music" className="text-current" />,
+    <CalendarIcon key="calendar" className="text-current" />,
+    <DollarSignIcon key="dollar" className="text-current" />,
   ]
 
   return steps.map((step, index) => ({
@@ -27,7 +29,14 @@ const mapStepsToStepItems = (steps: string[]): StepItem[] => {
 }
 
 export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
-  const stepItems = React.useMemo(() => mapStepsToStepItems(steps), [steps])
+  const { resolvedTheme } = useTheme()
+  const isDarkMode = resolvedTheme === "dark"
+  
+  const stepItems = React.useMemo(() => 
+    mapStepsToStepItems(steps), 
+    [steps]
+  )
+  
   const [hasAnimated, setHasAnimated] = useState(false)
   
   // Set hasAnimated to true after initial mount
@@ -47,6 +56,7 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
           steps={stepItems}
           activeStep={currentStep}
           disableFutureSteps={false}
+          className="transition-colors"
         />
       </div>
     </motion.div>

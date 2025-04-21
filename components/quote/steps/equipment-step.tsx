@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -18,7 +18,8 @@ import {
   BoxIcon, 
   CloudFogIcon, 
   MicIcon, 
-  TruckIcon 
+  TruckIcon,
+  CheckIcon
 } from "lucide-react"
 import { type Equipment, equipmentSchema } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -32,22 +33,27 @@ interface EquipmentStepProps {
 }
 
 const EQUIPMENT_PRICES = {
-  dj: 2500,
-  sound: 1500,
+  dj: 100000,
+  sound: {
+    "básico": 90000,
+    "estándar": 110000,
+    "exterior": 120000
+  },
   lighting: {
-    "estándar": 1200,
-    "profesional": 2500
+    "estándar": 100000,
+    "profesional": 120000
   },
   ledFloor: 3000,
-  archStructure: 1500,
-  spiderStructure: 2000,
-  fogMachine: 800,
-  ledDecoration: 350, // per unit
-  wirelessMic: 300, // per unit
+  archStructure: 100000,
+  spiderStructure: 200000,
+  fogMachine: 20000,
+  ledDecoration: 7000,
+  wirelessMic: 2000,
   outsideTransport: 1800
 }
 
 type LightingType = "estándar" | "profesional";
+type SoundType = "básico" | "estándar" | "exterior";
 
 export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepProps) {
   const [showQuoteSummary, setShowQuoteSummary] = useState(false)
@@ -59,6 +65,7 @@ export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepP
       dj: data?.dj ?? false,
       djSchedule: data?.djSchedule ?? "",
       sound: data?.sound ?? false,
+      soundType: data?.soundType ?? "estándar",
       lighting: data?.lighting ?? false,
       lightingType: data?.lightingType ?? "estándar",
       ledFloor: data?.ledFloor ?? false,
@@ -78,12 +85,30 @@ export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepP
   // Calculate the total price whenever form values change
   useEffect(() => {
     let price = 0
-    if (watchAllFields.dj) price += EQUIPMENT_PRICES.dj
-    if (watchAllFields.sound) price += EQUIPMENT_PRICES.sound
+    if (watchAllFields.dj) {
+      price += EQUIPMENT_PRICES.dj
+    }
+    
+    if (watchAllFields.sound) {
+      // Ensure sound type is valid or default to "estándar"
+      const soundType = (watchAllFields.soundType || "estándar") as SoundType
+      // Ensure soundType is set in the form
+      if (watchAllFields.soundType !== soundType) {
+        form.setValue("soundType", soundType)
+      }
+      price += EQUIPMENT_PRICES.sound[soundType]
+    }
+    
     if (watchAllFields.lighting) {
+      // Ensure lighting type is valid or default to "estándar"
       const lightingType = (watchAllFields.lightingType || "estándar") as LightingType
+      // Ensure lightingType is set in the form
+      if (watchAllFields.lightingType !== lightingType) {
+        form.setValue("lightingType", lightingType)
+      }
       price += EQUIPMENT_PRICES.lighting[lightingType]
     }
+    
     if (watchAllFields.ledFloor) price += EQUIPMENT_PRICES.ledFloor
     if (watchAllFields.archStructure) price += EQUIPMENT_PRICES.archStructure
     if (watchAllFields.spiderStructure) price += EQUIPMENT_PRICES.spiderStructure
@@ -98,14 +123,16 @@ export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepP
     if (watchAllFields.outsideTransport) price += EQUIPMENT_PRICES.outsideTransport
     
     setTotalPrice(price)
-  }, [watchAllFields])
+  }, [watchAllFields, form])
 
   const onSubmit = form.handleSubmit((values) => {
     onUpdate(values as Equipment);
     onNext();
   })
 
-  const canProceed = watchAllFields.dj && watchAllFields.sound
+  // Check if at least one basic service is selected
+  const hasAtLeastOneBasicService = watchAllFields.dj || watchAllFields.sound || watchAllFields.lighting;
+  const canProceed = hasAtLeastOneBasicService;
 
   const toggleQuoteSummary = () => {
     setShowQuoteSummary(prev => !prev)
@@ -118,6 +145,9 @@ export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepP
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold">Elige tu equipamiento</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Selecciona DJ, Sonido o Iluminación para continuar
+            </p>
           </div>
         </div>
       </div>
@@ -158,15 +188,45 @@ export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepP
                 name="sound"
                 title="Sonido"
                 description="Sistema de sonido profesional"
-                price={EQUIPMENT_PRICES.sound}
+                price={EQUIPMENT_PRICES.sound["estándar"]}
                 icon={<SpeakerIcon className="h-8 w-8" />}
                 form={form}
               >
                 {form.watch("sound") && (
-                  <div className="mt-3 border-t pt-2">
-                    <span className="text-sm font-medium block mb-1">
-                      4 parlantes sugeridos
-                    </span>
+                  <div className="mt-3 border-t pt-2" onClick={(e) => e.stopPropagation()}>
+                    <span className="text-sm font-medium block mb-2">Tipo:</span>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge 
+                        variant={form.watch("soundType") === "básico" ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          form.setValue("soundType", "básico");
+                        }}
+                      >
+                        Básico (3 parlantes)
+                      </Badge>
+                      <Badge 
+                        variant={form.watch("soundType") === "estándar" ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          form.setValue("soundType", "estándar");
+                        }}
+                      >
+                        Estándar (4 parlantes)
+                      </Badge>
+                      <Badge 
+                        variant={form.watch("soundType") === "exterior" ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          form.setValue("soundType", "exterior");
+                        }}
+                      >
+                        Exterior (5 parlantes)
+                      </Badge>
+                    </div>
                   </div>
                 )}
               </EquipmentCard>
@@ -213,46 +273,46 @@ export function EquipmentStep({ data, onUpdate, onNext, onBack }: EquipmentStepP
 
           {/* Extras Section */}
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-6">
               <h3 className="text-lg font-semibold">Extras</h3>
               <Separator className="flex-1" />
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
               <ExtraChip
                 name="archStructure"
                 label="Estructura arco"
+                description="Arco de estructura de aluminio"
                 price={EQUIPMENT_PRICES.archStructure}
                 form={form}
+                icon={<ArchiveIcon />}
               />
               <ExtraChip
                 name="spiderStructure"
                 label="Estructura araña"
+                description="Estructura para luces en altura"
                 price={EQUIPMENT_PRICES.spiderStructure}
                 form={form}
+                icon={<BoxIcon />}
               />
               <ExtraChip
                 name="fogMachine"
                 label="Máquina de humo"
+                description="Efecto atmosférico"
                 price={EQUIPMENT_PRICES.fogMachine}
                 form={form}
-              />
-              <ExtraChip
-                name="outsideTransport"
-                label="Transporte fuera de San Juan"
-                price={EQUIPMENT_PRICES.outsideTransport}
-                form={form}
+                icon={<CloudFogIcon />}
               />
             </div>
 
             {/* Counter Extras */}
-            <div className="mt-6">
+            <div className="mt-10">
               <div className="flex items-center gap-2 mb-4">
                 <h3 className="text-lg font-semibold">Cantidad de elementos</h3>
                 <Separator className="flex-1" />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <CounterExtra
                   name="ledDecoration"
                   label="Decoración LED"
@@ -390,30 +450,81 @@ function EquipmentCard({
 // Extra Chip Component
 function ExtraChip({ 
   name, 
-  label, 
+  label,
+  description = "",
   price, 
-  form 
+  form,
+  icon
 }: { 
   name: keyof Equipment, 
-  label: string, 
+  label: string,
+  description?: string,
   price: number, 
-  form: any 
+  form: any,
+  icon?: React.ReactNode
 }) {
   const isActive = form.watch(name) as boolean
 
   return (
     <div 
       className={cn(
-        "border rounded-full px-3 py-1 text-sm cursor-pointer transition-all",
+        "relative overflow-hidden border rounded-lg p-4 cursor-pointer transition-all duration-300",
+        "hover:shadow-md flex flex-col gap-3 group",
         isActive 
-          ? "border-primary bg-primary text-white" 
-          : "border-muted hover:border-primary/50"
+          ? "border-primary bg-primary/5 dark:bg-primary/10 shadow-sm" 
+          : "border-border hover:border-primary/40"
       )}
       onClick={() => form.setValue(name, !isActive)}
     >
-      <div className="flex justify-between items-center">
-        <span>{label}</span>
-        <span className="text-xs ml-1 opacity-80">${price.toLocaleString()}</span>
+      <div className="flex items-start justify-between">
+        <div className={cn(
+          "flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300",
+          isActive ? "bg-primary text-primary-foreground" : "bg-muted text-primary"
+        )}>
+          <div className="h-5 w-5">{icon}</div>
+        </div>
+        <div 
+          className={cn(
+            "flex-shrink-0 h-5 w-5 rounded-full border-2 transition-all duration-300",
+            isActive 
+              ? "border-primary bg-primary scale-110" 
+              : "border-muted scale-100"
+          )}
+        >
+          {isActive && <CheckIcon className="h-full w-full text-primary-foreground" />}
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <h4 className="font-medium text-foreground">{label}</h4>
+        {description && (
+          <p className="text-xs text-muted-foreground">{description}</p>
+        )}
+      </div>
+
+      <div className="mt-auto flex items-center justify-between">
+        <div className={cn(
+          "text-sm font-medium transition-colors",
+          isActive ? "text-primary" : "text-muted-foreground"
+        )}>
+          ${price.toLocaleString()}
+        </div>
+        <div className={cn(
+          "text-xs px-2 py-1 rounded-full transition-colors duration-300",
+          isActive 
+            ? "bg-primary/10 text-primary dark:bg-primary/20" 
+            : "bg-muted/60 text-muted-foreground"
+        )}>
+          {isActive ? "Incluido" : "Opcional"}
+        </div>
+      </div>
+      
+      {/* Ripple effect on selection */}
+      <div className={cn(
+        "absolute inset-0 pointer-events-none transition-opacity duration-500",
+        isActive ? "opacity-100" : "opacity-0"
+      )}>
+        <div className="absolute inset-0 bg-primary/10 scale-0 rounded-full transform origin-center animate-ripple"></div>
       </div>
     </div>
   )
@@ -495,15 +606,15 @@ function QuoteSummary({
       )}
       {equipment.sound && (
         <div className="flex justify-between text-sm">
-          <span>Sonido</span>
-          <span>${EQUIPMENT_PRICES.sound.toLocaleString()}</span>
+          <span>Sonido ({equipment.soundType || "estándar"})</span>
+          <span>${EQUIPMENT_PRICES.sound[equipment.soundType as SoundType || "estándar"].toLocaleString()}</span>
         </div>
       )}
       {equipment.lighting && (
         <div className="flex justify-between text-sm">
-          <span>Iluminación ({equipment.lightingType})</span>
+          <span>Iluminación ({equipment.lightingType || "estándar"})</span>
           <span>
-            ${EQUIPMENT_PRICES.lighting[equipment.lightingType as LightingType].toLocaleString()}
+            ${EQUIPMENT_PRICES.lighting[equipment.lightingType as LightingType || "estándar"].toLocaleString()}
           </span>
         </div>
       )}

@@ -64,7 +64,6 @@ export function ReviewStep({ data, onNext, onBack, onEdit }: ReviewStepProps) {
   // Check if everything is complete
   const isEventComplete = !!eventDetails.date && !!eventDetails.location && !!eventDetails.eventType
   const isBasicEquipmentComplete = equipment.dj && equipment.sound && (equipment.dj && !!equipment.djSchedule)
-  const isAllComplete = isEventComplete && isBasicEquipmentComplete
 
   const eventTypeMap: Record<string, string> = {
     boda: "Boda",
@@ -331,71 +330,6 @@ export function ReviewStep({ data, onNext, onBack, onEdit }: ReviewStepProps) {
           </ReviewSection>
         )}
 
-        {/* Conditional Rendering for Required Elements */}
-        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-full text-blue-600 dark:text-blue-400">
-              <InfoIcon className="h-5 w-5" />
-            </div>
-            <div>
-              <h4 className="font-medium text-blue-700 dark:text-blue-400">Requisitos mínimos</h4>
-              <p className="text-sm text-blue-600/70 dark:text-blue-500/70 mt-1">
-                Para continuar, es necesario incluir al menos:
-              </p>
-              <ul className="text-sm text-blue-600/70 dark:text-blue-500/70 mt-2 ml-4 list-disc">
-                <li>Servicio de DJ con horario</li>
-                <li>Sistema de sonido</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Status Summary with improved styling */}
-        {isAllComplete ? (
-          <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 rounded-lg">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-full text-green-600 dark:text-green-400">
-                <CheckIcon className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-medium text-green-700 dark:text-green-400">Todo listo para continuar</h4>
-                <p className="text-sm text-green-600/70 dark:text-green-500/70 mt-1">
-                  Se completaron todos los requisitos. Puedes continuar al presupuesto.
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900 rounded-lg">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-full text-amber-600 dark:text-amber-400">
-                <AlertTriangleIcon className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-medium text-amber-700 dark:text-amber-400">
-                  Hay secciones que requieren tu atención
-                </h4>
-                <p className="text-sm text-amber-600/70 dark:text-amber-500/70 mt-1">
-                  Por favor, completa todos los campos requeridos para continuar.
-                </p>
-                <ul className="text-sm text-amber-600/70 dark:text-amber-500/70 mt-2 ml-4 list-disc">
-                  {!isEventComplete && (
-                    <li>Completa los detalles del evento</li>
-                  )}
-                  {!equipment.dj && (
-                    <li>Incluye el servicio de DJ</li>
-                  )}
-                  {equipment.dj && !equipment.djSchedule && (
-                    <li>Especifica el horario del DJ</li>
-                  )}
-                  {!equipment.sound && (
-                    <li>Incluye el sistema de sonido</li>
-                  )}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="flex justify-between pt-4 border-t mt-6">
@@ -412,7 +346,6 @@ export function ReviewStep({ data, onNext, onBack, onEdit }: ReviewStepProps) {
         </Button>
         <Button 
           onClick={onNext} 
-          disabled={!isAllComplete}
           className="gap-2"
           aria-label="Continuar a la visualización del presupuesto"
         >
